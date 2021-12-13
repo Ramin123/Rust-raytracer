@@ -13,16 +13,22 @@ use image::{DynamicImage, GenericImage, Rgba, Pixel};
 use rendering::Ray;
 use rendering::Intersectable;
 
+// the main render function of the app:
+// takes a scene and generates prime Rays through the scene.
+// based on Intersection, the pixel is set to black or a color
 pub fn render(scene: &Scene) -> DynamicImage {
+    // create an empty image of our scene
     let mut image = DynamicImage::new_rgb8(scene.width, scene.height);
-    let black = Rgba::from_channels(0, 0, 0, 0);
+    let black = Rgba::from_channels(0, 0, 0, 0);        // black color
 
+    // itterate through every pixel in scene, create a prime Ray, 
+    // assess intersection with scene elements and assign color
+    // accordingly to draw the scene.
     for x in 0..scene.width {
         for y in 0..scene.height {
             let ray = Ray::create_prime(x, y, scene);
 
             if scene.sphere.intersect(&ray) {
-                println!("{}", 1);
                 image.put_pixel(x, y, scene.sphere.color.to_rgba())
                 
             } else {

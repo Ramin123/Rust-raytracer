@@ -11,6 +11,7 @@ use image::ImageFormat;
 use raytracer::point::Point;
 
 fn main() {
+    // use clap to access Command Line args for image output location
     let app = App::new("raytracer")
         .version("0.1")
         .author("bheisler <redattack34@gmail.com>")
@@ -19,10 +20,15 @@ fn main() {
             .help("Sets the output image file")
             .required(true)
             .index(1));
-    let matches = app.get_matches();
-    println!("helloo");
+    let matches = app.get_matches(); // get the args
+  
+
+    //TODO: file reading not working, ask Ari
     //let scene_path = matches.value_of("scene").unwrap();
     //let scene_file = File::open(scene_path).expect("File not found");
+
+    // Alternative approach: hard-code in a Scene rather than reading from a file
+    // not ideal but will do for now until above code is fixed.
     let s = Scene {
         width: 1920,
         height: 1900,
@@ -42,13 +48,15 @@ fn main() {
         },
     };
 
+    // unwrap image path from Args
     let image_path = matches.value_of("image").unwrap();
 
     //let scene: Scene = serde_json::from_reader(scene_file).unwrap();
 
-
+    // use render fn to render our Scene
     let image = raytracer::render(&s);
 
+    // generate file and save to file with PNG format
     let mut image_file =
         OpenOptions::new().write(true).truncate(true).create(true).open(image_path).unwrap();
     image.save(&mut image_file, ImageFormat::PNG).unwrap();

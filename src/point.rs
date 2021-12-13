@@ -2,6 +2,9 @@ use std::ops::{Add, Sub};
 use serde::{Deserialize, Serialize};
 use crate::vector::Vector3;
 
+// use derive to automatically implement common methods for our structs
+
+// Point: a point with an (x, y, z) on our scene, represents a pixel in this case
 #[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub struct Point {
     pub x: f64,
@@ -9,6 +12,7 @@ pub struct Point {
     pub z: f64,
 }
 
+// implementation for Point, zero() returns a Point at (0, 0, 0) 
 impl Point {
     pub fn zero() -> Point {
         Point::from_one(0.0)
@@ -18,6 +22,10 @@ impl Point {
         Point {x: v, y: v, z: v}
     }
 }
+
+
+// Various implementations for addition and subtraction 
+// functionality for Points vs Points and Points vs Vectors
 
 impl Add<Vector3> for Point {
     type Output = Point;
