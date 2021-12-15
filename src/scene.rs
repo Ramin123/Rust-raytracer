@@ -3,8 +3,10 @@ use crate::point::Point;
 use std::ops::{Add, Mul};
 use image::{ Pixel, Rgba};
 use serde::{Deserialize, Serialize};
-
+use crate::rendering::{Ray, Intersectable};
 const GAMMA: f32 = 2.2;
+
+
 
 // gamma encoding functions for better bit usage
 fn gamma_encode(linear: f32) -> f32 {
@@ -101,11 +103,34 @@ pub struct Sphere {
     pub color: Color,
 }
 
+// stores element types that can be drawn in scene
+#[derive(Deserialize, Serialize, Debug)]
+pub enum Element {
+    Sphere {color: Color},
+}
+
+// impl Element {
+//     pub color: Color;
+// }
+impl Intersectable for Element {
+    fn intersect(&self, ray: &Ray) -> bool {
+        false
+    }
+}
+//  pub trait Color {
+//     fn color(&self) -> Vec<u8> {
+//         //   [red: f32,
+//         //      green: f32,
+//         //      blue: f32,]
+//     }
+//  }
+
+
 // our basic scene consists of width, height, fov, and elments to draw
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Scene {
     pub width: u32,
     pub height: u32,
     pub fov: f64,
-    pub sphere: Sphere,
+    pub elements: Vec<Element>,
 }

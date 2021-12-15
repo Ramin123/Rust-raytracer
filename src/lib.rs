@@ -27,12 +27,13 @@ pub fn render(scene: &Scene) -> DynamicImage {
     for x in 0..scene.width {
         for y in 0..scene.height {
             let ray = Ray::create_prime(x, y, scene);
-
-            if scene.sphere.intersect(&ray) {
-                image.put_pixel(x, y, scene.sphere.color.to_rgba())
-                
-            } else {
-                image.put_pixel(x, y, black);
+            for e in scene.elements {
+                if e.intersect(&ray) {
+                    image.put_pixel(x, y, e.color.to_rgba())
+                    
+                } else {
+                    image.put_pixel(x, y, black);
+                }
             }
         }
     }

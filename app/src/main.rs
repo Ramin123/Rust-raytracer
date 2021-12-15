@@ -33,7 +33,7 @@ fn main() {
         width: 1920,
         height: 1900,
         fov: 90.0,
-        sphere: Sphere {
+        elements: [Sphere {
                 center: Point {
                     x: 0.0,
                     y: 0.0,
@@ -45,7 +45,7 @@ fn main() {
                     green: 1.0,
                     blue: 0.2
                 },
-        },
+        }],
     };
 
     // unwrap image path from Args
