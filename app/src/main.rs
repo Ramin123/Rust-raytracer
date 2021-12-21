@@ -1,7 +1,6 @@
 extern crate clap;
 extern crate serde;
 extern crate serde_json;
-extern crate raytracer;
 extern crate image;
 
 use clap::{Arg, App};
@@ -19,13 +18,17 @@ fn main() {
         .arg(Arg::with_name("image")
             .help("Sets the output image file")
             .required(true)
+            .index(2))
+        .arg(Arg::with_name("scene")
+            .help("Sets the scene json file")
+            .required(true)
             .index(1));
     let matches = app.get_matches(); // get the args
   
 
     //TODO: file reading not working, ask Ari
-    //let scene_path = matches.value_of("scene").unwrap();
-    //let scene_file = File::open(scene_path).expect("File not found");
+    let scene_path = matches.value_of("scene").unwrap();
+    let scene_file = File::open(scene_path).expect("File not found");
 
     // Alternative approach: hard-code in a Scene rather than reading from a file
     // not ideal but will do for now until above code is fixed.
@@ -33,14 +36,15 @@ fn main() {
         width: 1920,
         height: 1900,
         fov: 90.0,
-        elements: [Sphere {
+        geometry: vec![ Geometry { 
+            element: Element::Sphere(Sphere { 
                 center: Point {
                     x: 0.0,
                     y: 0.0,
                     z: -5.0
                 },
-                radius: 1.0,
-                color: Color {
+                radius: 1.0, }),
+            color: Color {
                     red: 0.2,
                     green: 1.0,
                     blue: 0.2
@@ -50,11 +54,11 @@ fn main() {
 
     // unwrap image path from Args
     let image_path = matches.value_of("image").unwrap();
-
-    //let scene: Scene = serde_json::from_reader(scene_file).unwrap();
+    print!("{:?}", scene_file);
+    let scene: Scene = serde_json::from_reader(scene_file).unwrap();
 
     // use render fn to render our Scene
-    let image = raytracer::render(&s);
+    let image = raytracer::render(&scene);
 
     // generate file and save to file with PNG format
     let mut image_file =

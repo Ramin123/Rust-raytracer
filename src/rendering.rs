@@ -46,22 +46,3 @@ impl Ray {
     }
 }
 
-// Intersectable trait for checking if something intersects a Ray
-pub trait Intersectable {
-    fn intersect(&self, ray: &Ray) -> bool {
-        false
-    }
-}
-// implementation for Sphere:
-// using basic trig, we can determin if a ray intersects a circle
-// when d2 is larger than the radius of the circle, it does NOT intersect
-impl Intersectable for Sphere {
-    fn intersect(&self, ray: &Ray) -> bool {
-        let l: Vector3 = self.center - ray.origin;  // the hypotenuse of our right triangle 
-        let adj2 = l.dot(&ray.direction);           // our ray is the adj side
-        let d2 = l.dot(&l) - (adj2 * adj2);
-
-        // if distance^2 < r^2 then ray intersects sphere
-        d2 < (self.radius * self.radius)
-    }
-}

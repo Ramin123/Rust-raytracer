@@ -1,18 +1,41 @@
 {
-  "width": 32000,
-  "height": 24000,
+  "width": 1080,
+  "height": 720,
   "fov": 90.0,
-  "Sphere": {
-    "center": {
-      "x": 0.0,
-      "y": 0.0,
-      "z": -5.0
+  "geometry": [
+    {
+      "element": {
+        "Sphere": {
+          "center": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -5.0
+          },
+          "radius": 1.0
+        }
+      },
+      "color": {
+        "red": 0.2,
+        "green": 1.0,
+        "blue": 0.2
+      }
     },
-    "radius": 1.0,
-    "color": {
-      "red": 0.2,
-      "green": 1.0,
-      "blue": 0.2
+    {
+      "element": {
+        "Sphere": {
+          "center": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -5.0
+          },
+          "radius": 0.5
+        }
+      },
+      "color": {
+        "red": 1.2,
+        "green": 1.0,
+        "blue": 0.2
+      }
     }
-  }
+  ]
 }

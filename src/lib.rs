@@ -6,12 +6,12 @@ extern crate serde;
 pub mod scene;
 pub mod point;
 pub mod vector;
-mod rendering;
+pub mod rendering;
 
 use scene::Scene;
 use image::{DynamicImage, GenericImage, Rgba, Pixel};
 use rendering::Ray;
-use rendering::Intersectable;
+use scene::Intersectable;
 
 // the main render function of the app:
 // takes a scene and generates prime Rays through the scene.
@@ -27,12 +27,13 @@ pub fn render(scene: &Scene) -> DynamicImage {
     for x in 0..scene.width {
         for y in 0..scene.height {
             let ray = Ray::create_prime(x, y, scene);
-            for e in scene.elements {
-                if e.intersect(&ray) {
-                    image.put_pixel(x, y, e.color.to_rgba())
-                    
+            for g in &scene.geometry {
+                let geo = g.element.intersect(&ray);
+                if geo.is_some() {
+                    image.put_pixel(x, y, geo.color.to_rgba());
                 } else {
-                    image.put_pixel(x, y, black);
+                    //image.put_pixel(x, y, black);
+                    
                 }
             }
         }

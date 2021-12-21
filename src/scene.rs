@@ -2,8 +2,9 @@
 use crate::point::Point;
 use std::ops::{Add, Mul};
 use image::{ Pixel, Rgba};
+use crate::vector::{Vector3};
 use serde::{Deserialize, Serialize};
-use crate::rendering::{Ray, Intersectable};
+use crate::rendering::{Ray};
 const GAMMA: f32 = 2.2;
 
 
@@ -100,30 +101,79 @@ impl Add for Color {
 pub struct Sphere {
     pub center: Point,
     pub radius: f64,
-    pub color: Color,
+}
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Plane {
+    pub origin: Point,
+    pub normal: Vector3,
 }
 
 // stores element types that can be drawn in scene
 #[derive(Deserialize, Serialize, Debug)]
 pub enum Element {
-    Sphere {color: Color},
+    Sphere(Sphere),
+    Plane(Plane),
 }
 
-// impl Element {
-//     pub color: Color;
-// }
 impl Intersectable for Element {
-    fn intersect(&self, ray: &Ray) -> bool {
-        false
+    fn intersect(&self, ray: &Ray) -> Option<f64> {
+        match self {
+            Element::Sphere(sphere) => {
+                let l: Vector3 = sphere.center - ray.origin;  // the hypotenuse of our right triangle 
+                let adj = l.dot(&ray.direction);           // our ray is the adj side
+                let d2 = l.dot(&l) - (adj * adj);
+        
+                let radius2 = sphere.radius * sphere.radius;
+                if d2 > radius2 {
+                    return None;
+                }
+                let thc = (radius2 - d2).sqrt();
+                let t0 = adj - thc;
+                let t1 = adj + thc;
+
+                if t0 < 0.0 && t1 < 0.0 {
+                    return None;
+                }
+
+                let distance = if t0 < t1 { t0 } else { t1 };
+                Some(distance)
+            }
+            Element::Plane(plane) => {
+                let normal = plane.normal;
+                let denom = normal.dot(&ray.direction);
+                if denom > 1e-6 {
+                    let v = plane.origin - ray.origin;
+                    let distance = v.dot(&normal) / denom;
+                    if distance >= 0.0 {
+                        return Some(distance);
+                    }
+                }
+                None
+            }
+        }
     }
 }
-//  pub trait Color {
-//     fn color(&self) -> Vec<u8> {
-//         //   [red: f32,
-//         //      green: f32,
-//         //      blue: f32,]
-//     }
-//  }
+pub struct Intersection<'a> {
+    pub distance: f64,
+    pub object: &'a Element,
+}
+
+impl<'a> Intersection<'a> {
+    pub fn new<'b>(d: f64, o: &'b Element) -> Intersection<'b>{
+         Intersection {distance: d, object: o,}
+    }
+}
+// Intersectable trait for checking if something intersects a Ray
+pub trait Intersectable {
+    fn intersect(&self, ray: &Ray) -> Option<f64>;
+}
+
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Geometry {
+    pub element: Element,
+    pub color: Color,
+}
 
 
 // our basic scene consists of width, height, fov, and elments to draw
@@ -132,5 +182,14 @@ pub struct Scene {
     pub width: u32,
     pub height: u32,
     pub fov: f64,
-    pub elements: Vec<Element>,
+    pub geometry: Vec<Geometry>,
+}
+
+impl Scene {
+    pub fn trace(&self, ray: &Ray) -> Option<Intersection> {
+        self.geometry
+            .iter()
+            .filter_map(|e| e.element.intersect(ray).map(|d| Intersection::new(d, &e.element)))
+            .min_by(|i1, i2| i1.distance.partial_cmp(&i2.distance).unwrap())
+    }
 }
